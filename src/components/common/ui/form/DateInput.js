@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Controller } from 'react-hook-form';
+import ReactDatePicker from 'react-datepicker';
 import _ from 'lodash';
 import clsx from 'clsx';
 
-function TextInput({
-                     inputRef, id, name, type, label, required, error, placeholder,
+function DateInput({
+                     control, id, name, label, validationRules, required, error, format,
                    }) {
   let styles = [
     'appearance-none', 'block', 'w-full', 'bg-gray-100', 'text-gray-700', 'border', 'border-gray-100',
@@ -28,13 +30,19 @@ function TextInput({
         )
       }
       <div>
-        <input
-          className={styles}
-          placeholder={placeholder}
+        <Controller
+          control={control}
           name={name}
-          type={type}
-          id={id}
-          ref={inputRef}
+          rules={validationRules}
+          render={({ onChange, onBlur, value }) => (
+            <ReactDatePicker
+              className={styles}
+              dateFormat={format}
+              onChange={onChange}
+              onBlur={onBlur}
+              selected={value}
+            />
+          )}
         />
         {
           error && <p className="text-red-500 text-xs italic">{error.message}</p>
@@ -44,23 +52,23 @@ function TextInput({
   );
 }
 
-TextInput.propTypes = {
-  inputRef: PropTypes.func.isRequired,
+DateInput.propTypes = {
+  control: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
   label: PropTypes.string,
-  placeholder: PropTypes.string,
   required: PropTypes.bool,
+  validationRules: PropTypes.object,
+  format: PropTypes.string,
   error: PropTypes.string,
 };
 
-TextInput.defaultProps = {
+DateInput.defaultProps = {
   required: false,
-  type: 'text',
   label: null,
-  placeholder: '',
+  validationRules: {},
   error: '',
+  format: 'dd-MM-yyyy',
 };
 
-export default TextInput;
+export default DateInput;

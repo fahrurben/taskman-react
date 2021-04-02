@@ -6,8 +6,9 @@ import * as tableStyles from './components/common/ui/table/styles';
 import Button from './components/common/ui/Button';
 import FilterInput from './components/common/ui/filter/FilterInput';
 import FilterSelect from './components/common/ui/filter/FilterSelect';
+import * as styles from './components/common/ui/styles';
 
-function App() {
+function ListData() {
   const { control, register, handleSubmit, errors: formErrors } = useForm();
 
   let cities = [
@@ -18,7 +19,7 @@ function App() {
     <div>
       <main className="px-14 py-8">
         <div>
-          <h2 className="text-2xl font-semibold leading-tight text-gray-600">Users</h2>
+          <h2 className={styles.page_title}>Users</h2>
         </div>
 
         <div className="my-2 flex sm:flex-row flex-col">
@@ -64,9 +65,9 @@ function App() {
                           <td className={tableStyles.td}>Admin</td>
                           <td className={tableStyles.td}>Admin</td>
                           <td className={tableStyles.td_last}>
-                            <a href="#" className="text-indigo-600 hover:text-indigo-900">Edit</a>
+                            <a href="#" className={tableStyles.op_link}>Edit</a>
                             &nbsp;|&nbsp;
-                            <a href="#" className="text-indigo-600 hover:text-indigo-900">Delete</a>
+                            <a href="#" className={tableStyles.op_link}>Delete</a>
                           </td>
                         </tr>
                       </tbody>
@@ -84,4 +85,4 @@ function App() {
   );
 }
 
-export default App;
+export default ListData;
