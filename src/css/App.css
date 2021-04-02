@@ -2,4 +2,5 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "./font-css/LineIcons.css";
 @import "~react-datepicker/dist/react-datepicker.css";

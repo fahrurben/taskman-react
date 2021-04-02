@@ -13,7 +13,7 @@ function FilterInput({
   ];
 
   if (position === 'start') {
-    styles = _.concat(styles, ['rounded-l'])
+    styles = _.concat(styles, ['border-l', 'rounded-l'])
   } else if (position === 'end') {
     styles = _.concat(styles, ['rounded-r'])
   }

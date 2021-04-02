@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './App.css';
+import './css/App.css';
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import * as tableStyles from './components/common/ui/table/styles';
