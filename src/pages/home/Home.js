@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import Modal from 'react-modal';
-import { fetchProjects, resetFormProjects } from '../../redux/slices/projectSlice';
+import { fetchProjects, resetFormProject, fetchProject, deleteProject } from '../../redux/slices/projectSlice';
 import * as tableStyles from '../../components/common/ui/table/styles';
 import FilterSelect from '../../components/common/ui/filter/FilterSelect';
 import FilterInput from '../../components/common/ui/filter/FilterInput';
@@ -27,11 +27,15 @@ function Home() {
   const { register, getValues, handleSubmit } = useForm();
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.projects);
+  const project = useSelector((state) => state.projects.project);
   const current_page = useSelector((state) => state.projects.current_page);
   const total_page = useSelector((state) => state.projects.total_page);
 
   const formProjectStatus = useSelector((state) => state.projects.formStatus);
+  const [selectedId,setSelectedId] = React.useState(null);
   const [modalNewIsOpen,setModalNewIsOpen] = React.useState(false);
+  const [modalEditIsOpen,setModalEditIsOpen] = React.useState(false);
+  const [modalDeleteIsOpen,setModalDeleteIsOpen] = React.useState(false);
 
   useEffect(() => {
     dispatch(fetchProjects(1, per_page, { name: '', code: '' }));
@@ -40,9 +44,15 @@ function Home() {
   useEffect(() => {
     if (formProjectStatus === SUCCEEDED) {
       setModalNewIsOpen(false);
-      toast.success("Project save successfully");
+      setModalEditIsOpen(false);
+      if (modalDeleteIsOpen === true) {
+        setModalDeleteIsOpen(false);
+        toast.success('Project deleted successfully');
+      } else {
+        toast.success("Project save successfully");
+      }
       gotoPage(current_page);
-      dispatch(resetFormProjects());
+      dispatch(resetFormProject());
     } else if (formProjectStatus === FAILED) {
       toast.error("Project save failed");
     }
@@ -54,6 +64,16 @@ function Home() {
 
   function onFormSearchSubmit(formData) {
     dispatch(fetchProjects(current_page, per_page, formData));
+  }
+
+  function editLinkClicked(id) {
+    dispatch(fetchProject(id));
+    setModalEditIsOpen(true);
+  }
+
+  function deleteLinkClicked(id) {
+    setSelectedId(id);
+    setModalDeleteIsOpen(true);
   }
 
   return (
@@ -116,9 +136,9 @@ function Home() {
                         <td className={tableStyles.td}>{project.code}</td>
                         <td className={tableStyles.td}>{project.description}</td>
                         <td className={tableStyles.td_last}>
-                          <a href="#" className={tableStyles.op_link}>Edit</a>
+                          <a href="#" onClick={() => editLinkClicked(project.id)} className={tableStyles.op_link}>Edit</a>
                           &nbsp;|&nbsp;
-                          <a href="#" className={tableStyles.op_link}>Delete</a>
+                          <a href="#" onClick={() => deleteLinkClicked(project.id)} className={tableStyles.op_link}>Delete</a>
                         </td>
                       </tr>
                     );
@@ -145,6 +165,47 @@ function Home() {
           closeDialog={() => setModalNewIsOpen(false)}
         >
         </FormProject>
+      </Modal>
+
+      <Modal
+        isOpen={modalEditIsOpen}
+        contentLabel="Edit Project"
+        style={modal_position}
+        onRequestClose={() => setModalEditIsOpen(false)}
+      >
+        <FormProject
+          defaultValue={project}
+          title="Edit Project"
+          closeDialog={() => setModalEditIsOpen(false)}
+        >
+        </FormProject>
+      </Modal>
+
+      <Modal
+        isOpen={modalDeleteIsOpen}
+        contentLabel="Delete Project"
+        style={modal_position}
+        onRequestClose={() => setModalDeleteIsOpen(false)}
+      >
+        <div className="px-4 pt-4">
+          <h3 className="text-xl text-gray-500 font-medium mb-4">Delete project</h3>
+          <p>Are you sure to delete this project ?</p>
+          <div className="flex flex-row justify-end mt-4">
+            <div className="mr-2">
+              <Button type="secondary"
+                      onClick={() => setModalDeleteIsOpen(false)}
+              >
+                No
+              </Button>
+            </div>
+
+            <Button
+              onClick={() => dispatch(deleteProject(selectedId))}
+            >
+              Yes
+            </Button>
+          </div>
+        </div>
       </Modal>
     </>
   )
