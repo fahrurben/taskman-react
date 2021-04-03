@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Controller } from 'react-hook-form';
-import ReactDatePicker from 'react-datepicker';
 import _ from 'lodash';
 import clsx from 'clsx';
 
-function DateInput({
-                     control, id, name, label, validationRules, required, error, format,
+function TextArea({
+                     inputRef, id, name, label, required, error, placeholder,
                    }) {
   let styles = [
     'appearance-none', 'block', 'w-full', 'bg-gray-100', 'text-gray-700', 'border', 'border-gray-100',
@@ -30,19 +28,12 @@ function DateInput({
         )
       }
       <div>
-        <Controller
-          control={control}
+        <textarea
+          className={styles}
+          placeholder={placeholder}
           name={name}
-          rules={validationRules}
-          render={({ onChange, onBlur, value }) => (
-            <ReactDatePicker
-              className={styles}
-              dateFormat={format}
-              onChange={onChange}
-              onBlur={onBlur}
-              selected={value}
-            />
-          )}
+          id={id}
+          ref={inputRef}
         />
         {
           error && <p className="text-red-500 text-xs italic">{error.message}</p>
@@ -52,23 +43,21 @@ function DateInput({
   );
 }
 
-DateInput.propTypes = {
-  control: PropTypes.func.isRequired,
+TextArea.propTypes = {
+  inputRef: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
+  placeholder: PropTypes.string,
   required: PropTypes.bool,
-  validationRules: PropTypes.object,
-  format: PropTypes.string,
   error: PropTypes.string,
 };
 
-DateInput.defaultProps = {
+TextArea.defaultProps = {
   required: false,
   label: null,
-  validationRules: {},
+  placeholder: '',
   error: '',
-  format: 'dd-MM-yyyy',
 };
 
-export default DateInput;
+export default TextArea;

@@ -1,27 +1,28 @@
 import axios from 'axios';
 import { createSlice } from '@reduxjs/toolkit';
 import { setConfig } from '../../helpers/AjaxHelper';
+import { IDLE, LOADING, SUCCEEDED, FAILED } from '../../constant';
 
 const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const initialState = {
   projects: [],
-  fetchStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  fetchStatus: IDLE, // 'idle' | 'loading' | 'succeeded' | 'failed'
   fetchError: null,
-  submitLoading: false,
+  formStatus: 'idle',
   submitError: null,
   current_page: 1,
   total_page: 1,
-  filter: {
-    name: '',
-    code: '',
-  },
-  sortBy: 'name',
-  sortType: 'asc',
+  // filter: {
+  //   name: '',
+  //   code: '',
+  // },
+  // sortBy: 'name',
+  // sortType: 'asc',
 };
 
 const projectsSlice = createSlice({
-  name: 'counter',
+  name: 'project_page',
   initialState: initialState,
   reducers: {
     setProjects: (state, action) => {
@@ -32,12 +33,28 @@ const projectsSlice = createSlice({
       state.fetchError = null;
     },
     setFetchProjectsLoading: (state) => {
-      state.fetchStatus = 'loading';
+      state.fetchStatus = LOADING;
       state.fetchError = null;
     },
     setFetchProjectsError: (state, action) => {
-      state.fetchStatus = 'error';
+      state.fetchStatus = FAILED;
       state.fetchError = action.payload;
+    },
+    setFormProjectsLoading: (state) => {
+      state.formStatus = LOADING;
+      state.fetchError = null;
+    },
+    setFormProjectsSuccess: (state) => {
+      state.formStatus = SUCCEEDED;
+      state.fetchError = null;
+    },
+    setFormProjectsError: (state, action) => {
+      state.formStatus = FAILED;
+      state.fetchError = action.payload;
+    },
+    resetFormProjects: (state) => {
+      state.formStatus = IDLE;
+      state.fetchError = null;
     },
   },
 });
@@ -46,6 +63,10 @@ export const {
   setProjects,
   setFetchProjectsLoading,
   setFetchProjectsError,
+  setFormProjectsLoading,
+  setFormProjectsSuccess,
+  setFormProjectsError,
+  resetFormProjects,
 } = projectsSlice.actions;
 
 export const fetchProjects = (page, per_page, filter) => {
@@ -61,5 +82,17 @@ export const fetchProjects = (page, per_page, filter) => {
     }
   }
 };
+
+export const saveProject = (project) => {
+  return async (dispatch) => {
+    try {
+      dispatch(setFormProjectsLoading());
+      const response = await axios.post(`${baseUrl}/api/project`, project, setConfig());
+      dispatch(setFormProjectsSuccess());
+    } catch (e) {
+      dispatch(setFormProjectsError(e?.response?.data?.message));
+    }
+  }
+}
 
 export default projectsSlice.reducer;

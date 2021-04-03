@@ -10,7 +10,7 @@ function Select({
 
   let styles = [
     'block', 'appearance-none', 'w-full', 'bg-gray-100', 'border', 'border-gray-100', 'text-gray-700',
-    'py-3', 'px-4', 'pr-8', 'rounded', 'mb-3'
+    'py-2', 'px-4', 'pr-8', 'rounded', 'mb-3'
   ];
   styles = error ? _.concat(styles, ['border-red-500']) : styles;
   styles = clsx(styles);

@@ -2,18 +2,26 @@ import React, { useEffect } from 'react';
 import _ from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { fetchProjects } from '../../redux/slices/projectSlice';
+import Modal from 'react-modal';
+import { fetchProjects, resetFormProjects } from '../../redux/slices/projectSlice';
 import * as tableStyles from '../../components/common/ui/table/styles';
 import FilterSelect from '../../components/common/ui/filter/FilterSelect';
 import FilterInput from '../../components/common/ui/filter/FilterInput';
 import Button from '../../components/common/ui/Button';
 import clsx from 'clsx';
-import { sortTypeOptions, per_page } from '../../constant';
+import { sortTypeOptions, per_page, FAILED } from '../../constant';
+import FormProject from './FormProject';
+import { toast } from 'react-toastify';
+import { modal_position } from '../../components/common/ui/styles';
+import Pagination from '../../components/common/ui/table/Pagination';
+import { SUCCEEDED } from '../../constant';
 
 const sortByOptions = [
   { id: 'name', name: 'Name' },
   { id: 'code', name: 'Code' },
 ];
+
+Modal.setAppElement('#root');
 
 function Home() {
   const { register, getValues, handleSubmit } = useForm();
@@ -21,11 +29,24 @@ function Home() {
   const projects = useSelector((state) => state.projects.projects);
   const current_page = useSelector((state) => state.projects.current_page);
   const total_page = useSelector((state) => state.projects.total_page);
-  const arrPages = _.range(total_page);
+
+  const formProjectStatus = useSelector((state) => state.projects.formStatus);
+  const [modalNewIsOpen,setModalNewIsOpen] = React.useState(false);
 
   useEffect(() => {
     dispatch(fetchProjects(1, per_page, { name: '', code: '' }));
   }, []);
+
+  useEffect(() => {
+    if (formProjectStatus === SUCCEEDED) {
+      setModalNewIsOpen(false);
+      toast.success("Project save successfully");
+      gotoPage(current_page);
+      dispatch(resetFormProjects());
+    } else if (formProjectStatus === FAILED) {
+      toast.error("Project save failed");
+    }
+  }, [formProjectStatus]);
 
   function gotoPage(page) {
     dispatch(fetchProjects(page, per_page, getValues()));
@@ -47,7 +68,7 @@ function Home() {
             <FilterSelect id="sort_by" name="sort_by" placeholder="Sort By" options={sortByOptions} inputRef={register}
                           position="start"/>
             <FilterSelect id="sort_type" name="sort_type" placeholder="Sort Type" options={sortTypeOptions}
-                          inputRef={register} position="start"/>
+                          inputRef={register}/>
             <FilterInput name="name" id="name" placeholder="Name" inputRef={register}/>
             <FilterInput name="code" id="code" placeholder="Code" inputRef={register} position="end"/>
             <div className="pl-2">
@@ -61,8 +82,7 @@ function Home() {
 
         <div className="float-right">
           <div className="my-2">
-            <Button onClick={() => {
-            }}>
+            <Button onClick={() => setModalNewIsOpen(true)}>
               <i className="lni lni-plus pr-2 pt-1"></i>
               New
             </Button>
@@ -112,39 +132,20 @@ function Home() {
       </div>
       {/* Table End */}
 
-      <div className="mt-4 flex flex-row justify-end">
-        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-          {
-            current_page > 1 &&
-            <a href="#" onClick={() => gotoPage(current_page - 1)}
-               className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-              <i className="lni lni-chevron-left"></i>
-            </a>
-          }
-          {
-            arrPages.length > 1
-            && arrPages.map((val) => {
-              const pageNumber = val + 1;
-              let pageStyles = ['relative', 'inline-flex', 'items-center', 'px-4', 'py-2', 'border', 'border-gray-300', 'bg-white', 'text-sm', 'font-medium', 'text-gray-700', 'hover:bg-gray-50'];
-              if (pageNumber == current_page) pageStyles = _.concat(pageStyles, ['bg-gray-200']);
-              pageStyles = clsx(pageStyles);
-              return (
-                <a href="#" onClick={() => gotoPage(pageNumber)}
-                   className={pageStyles}>
-                  {pageNumber}
-                </a>
-              )
-            })
-          }
-          {
-            current_page < total_page &&
-            <a href="#" onClick={() => gotoPage(current_page + 1)}
-               className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-              <i className="lni lni-chevron-right"></i>
-            </a>
-          }
-        </nav>
-      </div>
+      <Pagination current_page={current_page} gotoPage={gotoPage} total_page={total_page}/>
+
+      <Modal
+        isOpen={modalNewIsOpen}
+        contentLabel="New Project"
+        style={modal_position}
+        onRequestClose={() => setModalNewIsOpen(false)}
+      >
+        <FormProject
+          title="New Project"
+          closeDialog={() => setModalNewIsOpen(false)}
+        >
+        </FormProject>
+      </Modal>
     </>
   )
 }

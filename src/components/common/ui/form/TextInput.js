@@ -8,7 +8,7 @@ function TextInput({
                    }) {
   let styles = [
     'appearance-none', 'block', 'w-full', 'bg-gray-100', 'text-gray-700', 'border', 'border-gray-100',
-    'focus:outline-none', 'rounded', 'py-3', 'px-4', 'mb-3',
+    'focus:outline-none', 'rounded', 'py-2', 'px-4', 'mb-3',
   ];
   styles = error ? _.concat(styles, ['border-red-500']) : styles;
   styles = clsx(styles);

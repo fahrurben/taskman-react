@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useHistory, useLocation } from 'react-router-dom';
 import { AUTH_TOKEN_KEY } from '../../constant';
+import { ToastContainer } from 'react-toastify';
 
 export default function DefaultLayout({ children }) {
   const history = useHistory();
@@ -38,6 +39,9 @@ export default function DefaultLayout({ children }) {
           {children}
         </main>
       </mainwrapper>
+
+      <ToastContainer />
+
     </div>
   );
 }

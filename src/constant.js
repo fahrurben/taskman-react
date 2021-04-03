@@ -6,11 +6,9 @@ export const sortTypeOptions = [
   { id: 'desc', name: 'Desc' },
 ];
 
-export const per_page = 20;
-
-export const INITIAL = 'INITIAL';
-export const READY = 'READY';
-export const SUBMITTED = 'SUBMITTED';
-
-export const SUCCESS = 'SUCCESS';
-export const FAILED = 'FAILED';
+export const per_page = 5;
+// 'idle' | 'loading' | 'succeeded' | 'failed'
+export const IDLE = 'idle';
+export const LOADING = 'loading';
+export const SUCCEEDED = 'succeeded';
+export const FAILED = 'failed';

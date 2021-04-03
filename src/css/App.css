@@ -4,3 +4,4 @@
 @tailwind utilities;
 @import "./font-css/LineIcons.css";
 @import "~react-datepicker/dist/react-datepicker.css";
+@import 'react-toastify/dist/ReactToastify.css';
