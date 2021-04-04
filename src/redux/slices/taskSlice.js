@@ -118,7 +118,7 @@ export const saveTask = (task) => {
   return async (dispatch) => {
     try {
       dispatch(setFormTaskLoading());
-      const response = await axios.post(`${baseUrl}/api/task`, task, setConfig());
+      await axios.post(`${baseUrl}/api/task`, task, setConfig());
       dispatch(setFormTaskSuccess());
     } catch (e) {
       dispatch(setFormTaskError(e?.response?.data?.message));
@@ -130,7 +130,7 @@ export const updateTask = (id, task) => {
   return async (dispatch) => {
     try {
       dispatch(setFormTaskLoading());
-      const response = await axios.post(`${baseUrl}/api/task/${id}`, task, setConfig());
+      await axios.post(`${baseUrl}/api/task/${id}`, task, setConfig());
       dispatch(setFormTaskSuccess());
     } catch (e) {
       dispatch(setFormTaskError(e?.response?.data?.message));
@@ -142,7 +142,7 @@ export const deleteTask = (id) => {
   return async (dispatch) => {
     try {
       dispatch(setFormTaskLoading());
-      const response = await axios.delete(`${baseUrl}/api/task/${id}`, setConfig());
+      await axios.delete(`${baseUrl}/api/task/${id}`, setConfig());
       dispatch(setFormTaskSuccess());
     } catch (e) {
       dispatch(setFormTaskError(e?.response?.data?.message));

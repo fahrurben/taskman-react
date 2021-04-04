@@ -92,7 +92,7 @@ export const saveProject = (project) => {
   return async (dispatch) => {
     try {
       dispatch(setFormProjectLoading());
-      const response = await axios.post(`${baseUrl}/api/project`, project, setConfig());
+      await axios.post(`${baseUrl}/api/project`, project, setConfig());
       dispatch(setFormProjectSuccess());
     } catch (e) {
       dispatch(setFormProjectError(e?.response?.data?.message));
@@ -104,7 +104,7 @@ export const updateProject = (id, project) => {
   return async (dispatch) => {
     try {
       dispatch(setFormProjectLoading());
-      const response = await axios.post(`${baseUrl}/api/project/${id}`, project, setConfig());
+      await axios.post(`${baseUrl}/api/project/${id}`, project, setConfig());
       dispatch(setFormProjectSuccess());
     } catch (e) {
       dispatch(setFormProjectError(e?.response?.data?.message));
@@ -116,7 +116,7 @@ export const deleteProject = (id) => {
   return async (dispatch) => {
     try {
       dispatch(setFormProjectLoading());
-      const response = await axios.delete(`${baseUrl}/api/project/${id}`, setConfig());
+      await axios.delete(`${baseUrl}/api/project/${id}`, setConfig());
       dispatch(setFormProjectSuccess());
     } catch (e) {
       dispatch(setFormProjectError(e?.response?.data?.message));

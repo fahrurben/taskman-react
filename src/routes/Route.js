@@ -12,7 +12,7 @@ export default function RouteWrapper({
                                        isPrivate,
                                        ...rest
                                      }) {
-  const authToken = 'abc';//localStorage.getItem(AUTH_TOKEN_KEY);
+  const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
   const signed = authToken !== null;
 
   /**

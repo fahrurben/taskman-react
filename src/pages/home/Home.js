@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import _ from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 import { fetchProjects, resetFormProject, fetchProject, deleteProject } from '../../redux/slices/projectSlice';
 import * as tableStyles from '../../components/common/ui/table/styles';
@@ -136,6 +137,8 @@ function Home() {
                         <td className={tableStyles.td}>{project.code}</td>
                         <td className={tableStyles.td}>{project.description}</td>
                         <td className={tableStyles.td_last}>
+                          <Link className={tableStyles.op_link} to={`tasks/${project.id}`}>Tasks</Link>
+                          &nbsp;|&nbsp;
                           <a href="#" onClick={() => editLinkClicked(project.id)} className={tableStyles.op_link}>Edit</a>
                           &nbsp;|&nbsp;
                           <a href="#" onClick={() => deleteLinkClicked(project.id)} className={tableStyles.op_link}>Delete</a>
