@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import _ from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import { fetchProjects, resetFormProject, fetchProject, deleteProject } from '../../redux/slices/projectSlice';
 import * as tableStyles from '../../components/common/ui/table/styles';
@@ -10,39 +11,63 @@ import FilterInput from '../../components/common/ui/filter/FilterInput';
 import Button from '../../components/common/ui/Button';
 import clsx from 'clsx';
 import { sortTypeOptions, per_page, FAILED } from '../../constant';
-import FormProject from './FormProject';
 import { toast } from 'react-toastify';
-import { page_title, modal_position } from '../../components/common/ui/styles';
+import { modal_position, page_title } from '../../components/common/ui/styles';
 import Pagination from '../../components/common/ui/table/Pagination';
-import { SUCCEEDED } from '../../constant';
+import { TASK_TYPES, STATUS_TYPES, PRIORITY_TYPES, SUCCEEDED } from '../../constant';
+import { fetchInitial, fetchTasks, fetchTask, resetFormTask, deleteTask } from '../../redux/slices/taskSlice';
+import FormProject from '../home/FormProject';
+import FormTask from './FormTask';
 
 const sortByOptions = [
   { id: 'name', name: 'Name' },
-  { id: 'code', name: 'Code' },
+  { id: 'type', name: 'Type' },
+  { id: 'priority', name: 'Priority' },
+  { id: 'status', name: 'Status' },
+];
+
+const typeOptions = [
+  { id: 0, name: 'Bug' },
+  { id: 1, name: 'Feature' },
+];
+
+const priorityOptions = [
+  { id: 0, name: 'Low' },
+  { id: 1, name: 'Normal' },
+  { id: 2, name: 'High' },
+];
+
+const statusOptions = [
+  { id: 0, name: 'Back Log' },
+  { id: 1, name: 'In Progress' },
+  { id: 2, name: 'Done' },
 ];
 
 Modal.setAppElement('#root');
 
-function Home() {
+function Tasks() {
+  const { project_id } = useParams();
   const { register, getValues, handleSubmit } = useForm();
   const dispatch = useDispatch();
-  const projects = useSelector((state) => state.projects.projects);
-  const project = useSelector((state) => state.projects.project);
-  const current_page = useSelector((state) => state.projects.current_page);
-  const total_page = useSelector((state) => state.projects.total_page);
 
-  const formProjectStatus = useSelector((state) => state.projects.formStatus);
+  const tasks = useSelector((state) => state.tasks.tasks);
+  const task = useSelector((state) => state.tasks.task);
+  const project = useSelector((state) => state.tasks.project);
+  const current_page = useSelector((state) => state.tasks.current_page);
+  const total_page = useSelector((state) => state.tasks.total_page);
+
+  const formTaskStatus = useSelector((state) => state.tasks.formStatus);
   const [selectedId,setSelectedId] = React.useState(null);
   const [modalNewIsOpen,setModalNewIsOpen] = React.useState(false);
   const [modalEditIsOpen,setModalEditIsOpen] = React.useState(false);
   const [modalDeleteIsOpen,setModalDeleteIsOpen] = React.useState(false);
 
   useEffect(() => {
-    dispatch(fetchProjects(1, per_page, { name: '', code: '' }));
+    dispatch(fetchInitial(project_id));
   }, []);
 
   useEffect(() => {
-    if (formProjectStatus === SUCCEEDED) {
+    if (formTaskStatus === SUCCEEDED) {
       setModalNewIsOpen(false);
       setModalEditIsOpen(false);
       if (modalDeleteIsOpen === true) {
@@ -52,22 +77,22 @@ function Home() {
         toast.success("Project save successfully");
       }
       gotoPage(current_page);
-      dispatch(resetFormProject());
-    } else if (formProjectStatus === FAILED) {
+      dispatch(resetFormTask());
+    } else if (formTaskStatus === FAILED) {
       toast.error("Project save failed");
     }
-  }, [formProjectStatus]);
+  }, [formTaskStatus]);
 
   function gotoPage(page) {
-    dispatch(fetchProjects(page, per_page, getValues()));
+    dispatch(fetchTasks(page, per_page, getValues()));
   }
 
   function onFormSearchSubmit(formData) {
-    dispatch(fetchProjects(current_page, per_page, formData));
+    dispatch(fetchTasks(current_page, per_page, formData));
   }
 
   function editLinkClicked(id) {
-    dispatch(fetchProject(id));
+    dispatch(fetchTask(id));
     setModalEditIsOpen(true);
   }
 
@@ -79,7 +104,7 @@ function Home() {
   return (
     <>
       <div>
-        <h2 className={page_title}>Projects</h2>
+        <h2 className={page_title}>Tasks of '{project?.name}' project</h2>
       </div>
 
       <div className="flow-root">
@@ -90,7 +115,13 @@ function Home() {
             <FilterSelect id="sort_type" name="sort_type" placeholder="- Sort Type -" options={sortTypeOptions}
                           inputRef={register}/>
             <FilterInput name="name" id="name" placeholder="Name" inputRef={register}/>
-            <FilterInput name="code" id="code" placeholder="Code" inputRef={register} position="end"/>
+            <FilterSelect id="type" name="type" placeholder="- Type -" options={typeOptions}
+                          inputRef={register}/>
+            <FilterSelect id="priority" name="priority" placeholder="- Priority -" options={priorityOptions}
+                          inputRef={register}/>
+            <FilterSelect id="status" name="status" placeholder="- Status -" options={statusOptions}
+                          inputRef={register}/>
+            <input type="hidden" id="project_id" name="project_id" value={project_id} ref={register} />
             <div className="pl-2">
               <Button onClick={handleSubmit(onFormSearchSubmit)}>
                 <i className="lni lni-search-alt pr-2 pt-1"></i>
@@ -119,8 +150,10 @@ function Home() {
                 <thead className={tableStyles.thead}>
                 <tr>
                   <th scope="col" className={tableStyles.th}>Name</th>
-                  <th scope="col" className={tableStyles.th}>Code</th>
                   <th scope="col" className={tableStyles.th}>Description</th>
+                  <th scope="col" className={tableStyles.th}>Type</th>
+                  <th scope="col" className={tableStyles.th}>Priority</th>
+                  <th scope="col" className={tableStyles.th}>Status</th>
                   <th scope="col" className={tableStyles.th_last}>
                     <span className="sr-only">Edit</span>
                   </th>
@@ -128,17 +161,19 @@ function Home() {
                 </thead>
                 <tbody className={tableStyles.tbody}>
                 {
-                  projects &&
-                  projects.map((project) => {
+                  tasks &&
+                  tasks.map((task) => {
                     return (
-                      <tr key={project.id}>
-                        <td className={tableStyles.td}>{project.name}</td>
-                        <td className={tableStyles.td}>{project.code}</td>
-                        <td className={tableStyles.td}>{project.description}</td>
+                      <tr key={task.id}>
+                        <td className={tableStyles.td}>{task.name}</td>
+                        <td className={tableStyles.td}>{task.description}</td>
+                        <td className={tableStyles.td}>{TASK_TYPES?.[task.type]}</td>
+                        <td className={tableStyles.td}>{PRIORITY_TYPES?.[task.priority]}</td>
+                        <td className={tableStyles.td}>{STATUS_TYPES?.[task.status]}</td>
                         <td className={tableStyles.td_last}>
-                          <a href="#" onClick={() => editLinkClicked(project.id)} className={tableStyles.op_link}>Edit</a>
+                          <a href="#" onClick={() => editLinkClicked(task.id)} className={tableStyles.op_link}>Edit</a>
                           &nbsp;|&nbsp;
-                          <a href="#" onClick={() => deleteLinkClicked(project.id)} className={tableStyles.op_link}>Delete</a>
+                          <a href="#" onClick={() => deleteLinkClicked(task.id)} className={tableStyles.op_link}>Delete</a>
                         </td>
                       </tr>
                     );
@@ -156,42 +191,43 @@ function Home() {
 
       <Modal
         isOpen={modalNewIsOpen}
-        contentLabel="New Project"
+        contentLabel="New Task"
         style={modal_position}
         onRequestClose={() => setModalNewIsOpen(false)}
       >
-        <FormProject
-          title="New Project"
+        <FormTask
+          title="New Task"
+          project_id={project_id}
           type="create"
           closeDialog={() => setModalNewIsOpen(false)}
         >
-        </FormProject>
+        </FormTask>
       </Modal>
 
       <Modal
         isOpen={modalEditIsOpen}
-        contentLabel="Edit Project"
+        contentLabel="Edit Task"
         style={modal_position}
         onRequestClose={() => setModalEditIsOpen(false)}
       >
-        <FormProject
-          defaultValue={project}
-          title="Edit Project"
+        <FormTask
+          defaultValue={task}
+          title="Edit Task"
           type="update"
           closeDialog={() => setModalEditIsOpen(false)}
         >
-        </FormProject>
+        </FormTask>
       </Modal>
 
       <Modal
         isOpen={modalDeleteIsOpen}
-        contentLabel="Delete Project"
+        contentLabel="Delete Task"
         style={modal_position}
         onRequestClose={() => setModalDeleteIsOpen(false)}
       >
         <div className="px-4 pt-4">
-          <h3 className="text-xl text-gray-500 font-medium mb-4">Delete project</h3>
-          <p>Are you sure to delete this project ?</p>
+          <h3 className="text-xl text-gray-500 font-medium mb-4">Delete task</h3>
+          <p>Are you sure to delete this task ?</p>
           <div className="flex flex-row justify-end mt-4">
             <div className="mr-2">
               <Button type="secondary"
@@ -202,7 +238,7 @@ function Home() {
             </div>
 
             <Button
-              onClick={() => dispatch(deleteProject(selectedId))}
+              onClick={() => dispatch(deleteTask(selectedId))}
             >
               Yes
             </Button>
@@ -213,4 +249,4 @@ function Home() {
   )
 }
 
-export default Home;
+export default Tasks;

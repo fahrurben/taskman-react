@@ -30,7 +30,7 @@ const projectsSlice = createSlice({
       state.projects = action.payload.data;
       state.current_page = action.payload.current_page;
       state.total_page = action.payload.last_page;
-      state.fetchStatus = 'succeeded';
+      state.fetchStatus = SUCCEEDED;
       state.fetchError = null;
     },
     setProject: (state, action) => {
