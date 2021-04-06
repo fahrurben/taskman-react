@@ -8,6 +8,7 @@ const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const initialState = {
   formStatus: IDLE,
+  serverIsReady: false,
   submitError: null,
 };
 
@@ -15,6 +16,9 @@ const loginSlice = createSlice({
   name: 'login_page',
   initialState: initialState,
   reducers: {
+    setServerIsReady: (state, action) => {
+      state.serverIsReady = action.payload;
+    },
     setFormLoginLoading: (state) => {
       state.formStatus = LOADING;
       state.fetchError = null;
@@ -36,6 +40,7 @@ const loginSlice = createSlice({
 });
 
 export const {
+  setServerIsReady,
   setFormLoginLoading,
   setFormLoginSuccess,
   setFormLoginError,
@@ -51,6 +56,16 @@ export const doLogin = (authData) => {
       await setTimeout(() => {  dispatch(setFormLoginSuccess()); }, 100);
     } catch (e) {
       dispatch(setFormLoginError(e?.response?.data?.message));
+    }
+  }
+}
+
+export const checkServerIsReady = () => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${baseUrl}/api/check`, setConfig());
+      dispatch(setServerIsReady(true));
+    } catch (e) {
     }
   }
 }
