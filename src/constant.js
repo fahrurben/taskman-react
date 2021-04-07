@@ -14,6 +14,7 @@ export const LOADING = 'loading';
 export const SUCCEEDED = 'succeeded';
 export const FAILED = 'failed';
 
-export const TASK_TYPES = ['BUG'];
-export const PRIORITY_TYPES = ['LOW', 'NORMAL', 'HIGH'];
-export const STATUS_TYPES = ['BACK LOG', 'IN PROGRESS', 'DONE'];
+export const TASK_TYPES = ['Bug'];
+export const PRIORITY_TYPES = ['Low', 'Normal', 'High'];
+export const STATUS_TYPES = ['Back Log', 'In Progress', 'Done'];
+export const PRIORITY_COLORS = ['bg-green-500', 'bg-gray-500', 'bg-red-500'];

@@ -10,7 +10,7 @@ import FilterSelect from '../../components/common/ui/filter/FilterSelect';
 import FilterInput from '../../components/common/ui/filter/FilterInput';
 import Button from '../../components/common/ui/Button';
 import clsx from 'clsx';
-import { sortTypeOptions, per_page, FAILED } from '../../constant';
+import { sortTypeOptions, per_page, FAILED, PRIORITY_COLORS } from '../../constant';
 import { toast } from 'react-toastify';
 import { modal_position, page_title } from '../../components/common/ui/styles';
 import Pagination from '../../components/common/ui/table/Pagination';
@@ -72,14 +72,14 @@ function Tasks() {
       setModalEditIsOpen(false);
       if (modalDeleteIsOpen === true) {
         setModalDeleteIsOpen(false);
-        toast.success('Project deleted successfully');
+        toast.success('Task deleted successfully');
       } else {
-        toast.success("Project save successfully");
+        toast.success("Task save successfully");
       }
       gotoPage(current_page);
       dispatch(resetFormTask());
     } else if (formTaskStatus === FAILED) {
-      toast.error("Project save failed");
+      toast.error("Task save failed");
     }
   }, [formTaskStatus]);
 
@@ -163,12 +163,18 @@ function Tasks() {
                 {
                   tasks &&
                   tasks.map((task) => {
+                    let priorityStyle = ['py-2', 'px-4', 'shadow-md', 'no-underline', 'rounded-full', 'text-white'];
+                    priorityStyle = _.concat(priorityStyle, [PRIORITY_COLORS?.[task.priority]]);
+                    priorityStyle = clsx(priorityStyle);
+
                     return (
                       <tr key={task.id}>
                         <td className={tableStyles.td}>{task.name}</td>
                         <td className={tableStyles.td}>{task.description}</td>
                         <td className={tableStyles.td}>{TASK_TYPES?.[task.type]}</td>
-                        <td className={tableStyles.td}>{PRIORITY_TYPES?.[task.priority]}</td>
+                        <td className={tableStyles.td}>
+                          <span className={priorityStyle}>{PRIORITY_TYPES?.[task.priority]}</span>
+                        </td>
                         <td className={tableStyles.td}>{STATUS_TYPES?.[task.status]}</td>
                         <td className={tableStyles.td_last}>
                           <a href="#" onClick={() => editLinkClicked(task.id)} className={tableStyles.op_link}>Edit</a>
