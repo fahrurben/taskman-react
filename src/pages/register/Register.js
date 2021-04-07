@@ -3,14 +3,14 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import _ from 'lodash';
+import { toast, ToastContainer } from 'react-toastify';
 import TextInput from '../../components/common/ui/form/TextInput';
 import Button from '../../components/common/ui/Button';
 import { doRegister, resetFormRegister } from '../../redux/slices/registerSlice';
 import { FAILED, SUCCEEDED } from '../../constant';
-import { toast } from 'react-toastify';
 
 function Register() {
-  const { register, handleSubmit, errors: formErrors } = useForm();
+  const { register, getValues, handleSubmit, errors: formErrors } = useForm();
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -22,8 +22,11 @@ function Register() {
   }
   useEffect(() => {
     if (formLoginStatus === SUCCEEDED) {
-      history.push('/login');
-      dispatch(resetFormRegister());
+      toast.success('Register successfull');
+      _.delay(function() {
+        dispatch(resetFormRegister());
+        history.push('/login');
+      }, 3000);
     } else if (formLoginStatus === FAILED) {
     }
   }, [formLoginStatus]);
@@ -97,6 +100,20 @@ function Register() {
             </div>
             <div>
               <TextInput
+                id="repassword"
+                name="repassword"
+                type="password"
+                label="Password Confirmation"
+                required="true"
+                inputRef={register({
+                  required: { value: true, message: 'Password confirmation is required' },
+                  validate: (repassword) => repassword === getValues('password') || 'Password Confirmation must same with Password'
+                })}
+                error={formErrors?.repassword}
+              />
+            </div>
+            <div>
+              <TextInput
                 id="company_name"
                 name="company_name"
                 type="company_name"
@@ -127,6 +144,9 @@ function Register() {
           </div>
         </form>
       </div>
+
+      <ToastContainer />
+
     </div>
   )
 }
