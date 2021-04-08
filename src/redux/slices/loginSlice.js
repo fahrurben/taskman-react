@@ -53,7 +53,8 @@ export const doLogin = (authData) => {
       dispatch(setFormLoginLoading());
       const response = await axios.post(`${baseUrl}/api/auth/login`, authData, setConfig());
       localStorage.setItem(AUTH_TOKEN_KEY, response?.data?.access_token);
-      await setTimeout(() => {  dispatch(setFormLoginSuccess()); }, 100);
+      localStorage.setItem('full_name', response?.data?.full_name)
+      dispatch(setFormLoginSuccess());
     } catch (e) {
       dispatch(setFormLoginError(e?.response?.data?.message));
     }

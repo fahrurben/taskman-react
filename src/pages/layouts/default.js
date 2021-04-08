@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify';
 
 export default function DefaultLayout({ children }) {
   const history = useHistory();
+  const full_name = localStorage.getItem('full_name');
 
   const logoutClicked = () => {
     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -33,7 +34,7 @@ export default function DefaultLayout({ children }) {
           </div>
           <div className="float-right flex flex-row items-center h-full border-l border-gray-300 p-4">
             <i className="lni lni-user inline-block h-6 w-6 rounded-full ring-2 ring-white"></i>
-            <a href="#" className="display-block">John Doe</a>
+            <a href="#" className="display-block">{full_name}</a>
           </div>
         </header>
 
